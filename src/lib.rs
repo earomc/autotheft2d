@@ -1,6 +1,7 @@
 pub mod controller;
 pub mod map;
 pub mod player;
+pub mod vehicle;
 
 use macroquad::prelude::*;
 

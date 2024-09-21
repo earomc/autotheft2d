@@ -27,6 +27,7 @@ impl Controller {
         if let Some(facing) = self.get_facing() {
             character.facing = facing;
             character.pos_add(facing.as_vector() * character.movement_speed * get_frame_time());
+            println!("{:?}", character.pos);
         }
     }
     fn update_state(&mut self) {

@@ -2,7 +2,7 @@ use array2d::Array2D;
 use macroquad::prelude::*;
 
 pub const TILE_TEX_SIZE: f32 = 32.;
-pub const TILE_TEXTURE_SCALING_FAC: f32 = 8.;
+pub const TILE_TEXTURE_SCALING_FAC: f32 = 16.;
 
 pub struct Map<'a> {
     tiles: Array2D<Tile<'a>>,
@@ -19,15 +19,15 @@ impl<'a> Map<'a> {
     }
 
     pub fn draw(&self, world_space_pos: Vec2) {
-        for (tile_x_worldspace, tile_row) in self.tiles.rows_iter().enumerate() {
-            for (tile_y_worldspace, tile) in tile_row.enumerate() {
+        for (x_tile, tile_row) in self.tiles.rows_iter().enumerate() {
+            for (y_tile, tile) in tile_row.enumerate() {
                 tile.draw_at_screenspace(
                     //  + (screen_width() / 2. - TILE_TEX_SIZE / 2.)
                     // + (screen_height() / 2. - TILE_TEX_SIZE / 2.)
                     -world_space_pos.x
-                        + tile_x_worldspace as f32 * TILE_TEX_SIZE * TILE_TEXTURE_SCALING_FAC,
+                        + x_tile as f32 * TILE_TEX_SIZE * TILE_TEXTURE_SCALING_FAC,
                     -world_space_pos.y
-                        + tile_y_worldspace as f32 * TILE_TEX_SIZE * TILE_TEXTURE_SCALING_FAC,
+                        + y_tile as f32 * TILE_TEX_SIZE * TILE_TEXTURE_SCALING_FAC,
                 );
             }
         }
