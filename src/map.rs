@@ -1,8 +1,8 @@
 use array2d::Array2D;
 use macroquad::prelude::*;
 
-use crate::TILE_TEXTURE_SCALING_FAC;
 pub const TILE_TEX_SIZE: f32 = 32.;
+pub const TILE_TEXTURE_SCALING_FAC: f32 = 8.;
 
 pub struct Map<'a> {
     tiles: Array2D<Tile<'a>>,
