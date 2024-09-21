@@ -1,8 +1,8 @@
 use macroquad::prelude::*;
 
-use crate::{Character, Direction};
+use crate::{player::Player, Direction};
 
-pub fn handle_key_inputs(character: &mut Character) {
+pub fn handle_key_inputs(character: &mut Player) {
     let mut state = Controller::default();
     state.update_state();
    
@@ -21,7 +21,7 @@ pub struct Controller {
 }
 
 impl Controller {
-    pub fn handle_key_inputs(&mut self, character: &mut Character) {
+    pub fn handle_key_inputs(&mut self, character: &mut Player) {
         self.update_state();
        
         if let Some(facing) = self.get_facing() {

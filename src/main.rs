@@ -1,4 +1,4 @@
-use autotheft2d::{controller::Controller, map::Map, Character};
+use autotheft2d::{controller::Controller, map::Map, player::Player};
 use macroquad::prelude::*;
 const WINDOW_HEIGHT: i32 = 720;
 const WINDOW_WIDTH: i32 = 1280;
@@ -15,9 +15,9 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let character_sprite = load_texture("assets/character.png").await.unwrap();
+    let player_sprite = load_texture("assets/character.png").await.unwrap();
     let tile_map = load_texture("assets/map_tiles.png").await.unwrap();
-    let mut character = Character::new(character_sprite);
+    let mut character = Player::new(player_sprite);
     
     let map = Map::new(&tile_map);
    
