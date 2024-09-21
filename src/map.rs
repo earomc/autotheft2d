@@ -2,6 +2,7 @@ use array2d::Array2D;
 use macroquad::prelude::*;
 
 use crate::TILE_TEXTURE_SCALING_FAC;
+pub const TILE_TEX_SIZE: f32 = 32.;
 
 pub struct Map<'a> {
     tiles: Array2D<Tile<'a>>,
@@ -9,7 +10,7 @@ pub struct Map<'a> {
 
 impl<'a> Map<'a> {
     pub fn new(tile_map_texture: &'a Texture2D) -> Self {
-        let tile = Tile::new(tile_map_texture, TileVariant::empty());
+        let tile = Tile::new(tile_map_texture, (true, true, true, true).into());
         let mut tiles = Array2D::filled_with(tile, 16, 16);
         for y in 0..16 {
             tiles[(8, y)] =  Tile::new(tile_map_texture, (true, false, true, false).into());
@@ -17,15 +18,15 @@ impl<'a> Map<'a> {
         Map { tiles }
     }
 
-    pub fn draw(&self, world_space_pos: (f32, f32)) {
+    pub fn draw(&self, world_space_pos: Vec2) {
         for (tile_x_worldspace, tile_row) in self.tiles.rows_iter().enumerate() {
             for (tile_y_worldspace, tile) in tile_row.enumerate() {
                 tile.draw_at_screenspace(
                     //  + (screen_width() / 2. - TILE_TEX_SIZE / 2.)
                     // + (screen_height() / 2. - TILE_TEX_SIZE / 2.)
-                    -world_space_pos.0
+                    -world_space_pos.x
                         + tile_x_worldspace as f32 * TILE_TEX_SIZE * TILE_TEXTURE_SCALING_FAC,
-                    -world_space_pos.1
+                    -world_space_pos.y
                         + tile_y_worldspace as f32 * TILE_TEX_SIZE * TILE_TEXTURE_SCALING_FAC,
                 );
             }
@@ -33,8 +34,6 @@ impl<'a> Map<'a> {
     }
     fn add_tile(&mut self, x: i32, y: i32, tile: Tile) {}
 }
-
-pub const TILE_TEX_SIZE: f32 = 32.;
 
 #[derive(Clone)]
 pub struct Tile<'a> {
