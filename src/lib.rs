@@ -1,4 +1,5 @@
 pub mod controller;
+pub mod draw;
 pub mod map;
 pub mod player;
 pub mod vehicle;

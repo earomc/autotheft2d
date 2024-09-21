@@ -1,4 +1,4 @@
-use autotheft2d::{controller::Controller, map::Map, player::Player, vehicle::Vehicle};
+use autotheft2d::{controller::Controller, draw::Draw, map::Map, player::Player, vehicle::Vehicle};
 use macroquad::prelude::*;
 const WINDOW_HEIGHT: i32 = 720;
 const WINDOW_WIDTH: i32 = 1280;
@@ -25,9 +25,10 @@ async fn main() {
     let mut controller = Controller::default();
     loop {
         controller.handle_key_inputs(&mut character);
+        clear_background(DARKGREEN);
         map.draw(character.pos);
         character.draw();
-        vehicle.draw(character.pos);
+        vehicle.draw_at_world_space(character.pos);
         next_frame().await
     }
 }
