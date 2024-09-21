@@ -1,4 +1,4 @@
-mod map;
+pub mod map;
 
 use macroquad::prelude::*;
 

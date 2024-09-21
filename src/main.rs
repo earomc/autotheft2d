@@ -1,6 +1,5 @@
-use autotheft2d::{Character, Direction};
+use autotheft2d::{map::Tile, Character, Direction};
 use macroquad::prelude::*;
-
 const WINDOW_HEIGHT: i32 = 720;
 const WINDOW_WIDTH: i32 = 1280;
 
@@ -17,7 +16,11 @@ fn window_conf() -> Conf {
 #[macroquad::main(window_conf)]
 async fn main() {
     let character_sprite = load_texture("assets/character.png").await.unwrap();
+    let tile_map = load_texture("assets/map_tiles.png").await.unwrap();
     let mut character = Character::new(character_sprite);
+    
+    let tile = Tile::new(&tile_map, (true, true, false, true).into());
+    
     let mut direction_iter = Direction::SOUTH.into_iter();
     let mut timer_current = 0.;
     loop {
@@ -28,6 +31,7 @@ async fn main() {
             timer_current -= 0.5
         }
         character.draw();
+        tile.draw();
         next_frame().await
     }
 }
