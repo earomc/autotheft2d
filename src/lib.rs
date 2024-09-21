@@ -1,3 +1,5 @@
+mod map;
+
 use macroquad::prelude::*;
 
 pub struct Character {

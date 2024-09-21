@@ -18,7 +18,7 @@ fn window_conf() -> Conf {
 async fn main() {
     let character_sprite = load_texture("assets/character.png").await.unwrap();
     let mut character = Character::new(character_sprite);
-    let mut direction_iter = Direction::NORTH.into_iter();
+    let mut direction_iter = Direction::SOUTH.into_iter();
     let mut timer_current = 0.;
     loop {
         timer_current += get_frame_time();
