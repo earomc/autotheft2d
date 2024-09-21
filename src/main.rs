@@ -15,7 +15,7 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let player_sprite = load_texture("assets/character.png").await.unwrap();
+    let player_sprite = load_texture("assets/player.png").await.unwrap();
     let tile_map = load_texture("assets/map_tiles.png").await.unwrap();
     let mut character = Player::new(player_sprite);
     
