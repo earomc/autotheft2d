@@ -14,11 +14,11 @@ pub struct Map<'a> {
 
 impl<'a> Map<'a> {
     pub fn new(tile_map_texture: &'a Texture2D) -> Self {
-        let world_size = 1;
+        let world_size = 16;
         let tile = Tile::new(
             tile_map_texture,
             (0., 0.).into(),
-            (true, true, true, true).into(),
+            (false, true, false, true).into(),
         );
         let mut tiles = Array2::from_elem((world_size, world_size), tile);
         for ((x_tile, y_tile), tile) in tiles.indexed_iter_mut() {
@@ -42,7 +42,6 @@ impl<'a> Map<'a> {
             tile.draw_at_world_space(player_pos);
         }
     }
-    fn add_tile(&mut self, x: i32, y: i32, tile: Tile) {}
 }
 
 #[derive(Clone)]

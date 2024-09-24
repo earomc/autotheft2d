@@ -62,3 +62,7 @@ impl Iterator for DirectionIter {
         Some(next)
     }
 }
+
+pub trait Update {
+    fn update(&mut self);
+}

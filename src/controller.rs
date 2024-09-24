@@ -3,32 +3,26 @@ use macroquad::prelude::*;
 use crate::{player::Player, Direction};
 
 pub fn handle_key_inputs(character: &mut Player) {
-    let mut state = Controller::default();
+    let mut state = ControllerState::default();
     state.update_state();
-   
     if let Some(facing) = state.get_facing() {
         character.facing = facing;
-        character.pos_add(dbg!(facing.as_vector()) * character.movement_speed * get_frame_time());
+        character.pos_add(facing.as_vector() * character.movement_speed * get_frame_time());
     }
 }
 
 #[derive(Default)]
-pub struct Controller {
+pub struct ControllerState {
     w_pressed: bool,
     a_pressed: bool,
     s_pressed: bool,
     d_pressed: bool,
 }
 
-impl Controller {
-    pub fn handle_key_inputs(&mut self, character: &mut Player) {
+impl ControllerState {
+    pub fn handle_key_inputs(&mut self, player: &mut Player) {
         self.update_state();
-       
-        if let Some(facing) = self.get_facing() {
-            character.facing = facing;
-            character.pos_add(facing.as_vector() * character.movement_speed * get_frame_time());
-            println!("{:?}", character.pos);
-        }
+        player.handle_controls(self.get_facing());
     }
     fn update_state(&mut self) {
         if is_key_down(KeyCode::W) {
@@ -55,49 +49,49 @@ impl Controller {
     
     fn get_facing(&self) -> Option<Direction> {
         match self {
-            Controller {
+            ControllerState {
                 w_pressed: true,
                 a_pressed: false,
                 s_pressed: false,
                 d_pressed: false,
             } => Some(Direction::North),
-            Controller {
+            ControllerState {
                 w_pressed: true,
                 a_pressed: false,
                 s_pressed: false,
                 d_pressed: true,
             } => Some(Direction::NorthEast),
-            Controller {
+            ControllerState {
                 w_pressed: false,
                 a_pressed: false,
                 s_pressed: false,
                 d_pressed: true,
             } => Some(Direction::East),
-            Controller {
+            ControllerState {
                 w_pressed: false,
                 a_pressed: false,
                 s_pressed: true,
                 d_pressed: true,
             } => Some(Direction::SouthEast),
-            Controller {
+            ControllerState {
                 w_pressed: false,
                 a_pressed: false,
                 s_pressed: true,
                 d_pressed: false,
             } => Some(Direction::South),
-            Controller {
+            ControllerState {
                 w_pressed: false,
                 a_pressed: true,
                 s_pressed: true,
                 d_pressed: false,
             } => Some(Direction::SouthWest),
-            Controller {
+            ControllerState {
                 w_pressed: false,
                 a_pressed: true,
                 s_pressed: false,
                 d_pressed: false,
             } => Some(Direction::West),
-            Controller {
+            ControllerState {
                 w_pressed: true,
                 a_pressed: true,
                 s_pressed: false,
