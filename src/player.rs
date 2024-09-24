@@ -1,6 +1,6 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, env::consts::FAMILY, rc::Rc};
 
-use crate::{draw::Draw, vehicle::Vehicle, Direction, Update};
+use crate::{controller::ControllerState, draw::Draw, vehicle::Vehicle, Direction, Update};
 use macroquad::prelude::*;
 
 pub const PLAYER_TEXTURE_SCALING_FAC: f32 = 4.;
@@ -44,41 +44,45 @@ impl<'a> Player<'a> {
         self.draw_at_screen_space(screen_pos);
     }
 
-    pub fn handle_controls(&mut self, facing: Option<Direction>) {
+    pub fn handle_controls(&mut self, controller: &ControllerState) {
         if let Some(vehicle) = self.in_vehicle.clone() {
             let mut vehicle = vehicle.borrow_mut();
-            match facing {
+            match controller.get_facing() {
                 // refactor by passing in ControllerState directly? makes code simpler.
-                Some(facing) => match facing {
-                    Direction::North => {
-                        vehicle.throttle = 1.;
-                        vehicle.steer_neutral();
-                    }
-                    Direction::NorthEast => {
-                        vehicle.throttle = 1.;
-                        vehicle.steer_right();
-                    }
-                    Direction::East => {
-                        vehicle.steer_right();
-                    }
-                    Direction::SouthEast => {
-                        vehicle.throttle = -1.;
-                        vehicle.steer_right();
-                    }
-                    Direction::South => {
-                        vehicle.throttle = -1.;
-                        vehicle.steer_neutral();
-                    }
-                    Direction::SouthWest => {
-                        vehicle.throttle = -1.;
-                        vehicle.steer_left();
-                    }
-                    Direction::West => {
-                        vehicle.steer_left();
-                    }
-                    Direction::NorthWest => {
-                        vehicle.throttle = 1.;
-                        vehicle.steer_left();
+                Some(facing) => {
+                    match facing {
+                        Direction::North => {
+                            vehicle.throttle = 1.;
+                            vehicle.steer_neutral();
+                        },
+                        Direction::NorthEast => {
+                            vehicle.throttle = 1.;
+                            vehicle.steer_right();
+                        },
+                        Direction::East => {
+                            vehicle.steer_right();
+                            vehicle.throttle = 0.;
+                        },
+                        Direction::SouthEast => {
+                            vehicle.steer_right();
+                            vehicle.throttle = -1.;
+                        },
+                        Direction::South => {
+                            vehicle.throttle = -1.;
+                            vehicle.steer_neutral();
+                        },
+                        Direction::SouthWest => {
+                            vehicle.steer_left();
+                            vehicle.throttle = -1.
+                        },
+                        Direction::West => {
+                            vehicle.steer_left();
+                            vehicle.throttle = 0.;
+                        },
+                        Direction::NorthWest => {
+                            vehicle.steer_left();
+                            vehicle.throttle = 1.;
+                        },
                     }
                 },
                 None => {
@@ -87,7 +91,7 @@ impl<'a> Player<'a> {
                 }
             }
         } else {
-            if let Some(facing) = facing {
+            if let Some(facing) = controller.get_facing() {
                 self.facing = facing;
                 self.pos_add(facing.as_vector() * self.movement_speed * get_frame_time());
             }

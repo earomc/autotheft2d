@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 use ndarray::Array2;
 
-use crate::draw::Draw;
+use crate::{draw::Draw, util::SpiralIterator};
 
 pub const TILE_TEX_SIZE: f32 = 32.;
 pub const TILE_TEXTURE_SCALING_FAC: f32 = 16.;
@@ -13,34 +13,46 @@ pub struct Map<'a> {
 }
 
 impl<'a> Map<'a> {
-    pub fn new(tile_map_texture: &'a Texture2D) -> Self {
-        let world_size = 16;
+    pub fn new(tile_map_texture: &'a Texture2D, world_length_tiles: usize) -> Self {
         let tile = Tile::new(
             tile_map_texture,
             (0., 0.).into(),
-            (false, true, false, true).into(),
+            (true, true, true, true).into(),
         );
-        let mut tiles = Array2::from_elem((world_size, world_size), tile);
+        let mut tiles = Array2::from_elem((world_length_tiles, world_length_tiles), tile);
         for ((x_tile, y_tile), tile) in tiles.indexed_iter_mut() {
-            let x_tile = x_tile as i32 - world_size as i32 / 2;
-            let y_tile = y_tile as i32 - world_size as i32 / 2;
+            let x_tile = x_tile as i32 - world_length_tiles as i32 / 2;
+            let y_tile = y_tile as i32 - world_length_tiles as i32 / 2;
             tile.pos = (
                 x_tile as f32 * Tile::texture_size_scaled(),
                 y_tile as f32 * Tile::texture_size_scaled(),
             )
                 .into();
-            println!("{:?}", tile.pos);
         }
-        //for y in 0..world_size as usize {
-        //    tiles[(0, y)] = Tile::new(tile_map_texture, (false, true, false, true).into());
-        //}
-        Map { tiles, world_size }
+        Map { tiles, world_size: world_length_tiles }
     }
-
-    pub fn draw(&self, player_pos: Vec2) {
-        for tile in &self.tiles {
-            tile.draw_at_world_space(player_pos);
-        }
+    
+    // tpos_world = (tpos - world_len / 2) * tex_scaled
+    // tpos = tpos_world / tex_scaled + world_len / 2
+    pub fn to_tile_index_pos(&self, world_pos: Vec2) -> (usize, usize) {
+        let x = (world_pos.x / Tile::texture_size_scaled()) as isize + self.world_size as isize / 2;
+        let y = (world_pos.y / Tile::texture_size_scaled()) as isize + self.world_size as isize / 2;
+        (x as usize, y as usize)
+    }
+    
+    pub fn draw(&self, player_pos: Vec2, radius: usize) -> Option<&Tile<'a>> {
+        let center = self.to_tile_index_pos(player_pos);
+        let spiral = SpiralIterator::new(center);
+        self.tiles.get(center).map(|tile| tile.draw_at_world_space(player_pos));
+        spiral.take(radius * radius).for_each(|pos| {
+            self.tiles.get(pos).map(|tile| tile.draw_at_world_space(player_pos));
+        });
+        
+        self.tiles.get(self.to_tile_index_pos(player_pos))
+    }
+    
+    pub fn get_tile(&self, pos: (usize, usize)) -> Option<&Tile<'a>> {
+        self.tiles.get(pos)
     }
 }
 

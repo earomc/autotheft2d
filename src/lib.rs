@@ -3,6 +3,7 @@ pub mod draw;
 pub mod map;
 pub mod player;
 pub mod vehicle;
+pub mod util;
 
 use macroquad::prelude::*;
 
@@ -30,6 +31,22 @@ impl Direction {
             Direction::West => (-1., 0.).into(),
             Direction::NorthWest => (-45.0_f32.cos(), -45.0_f32.sin()).into(),
         }
+    }
+    
+    fn has_north(&self) -> bool {
+        matches!(self, Direction::North | Direction::NorthWest | Direction::NorthEast)
+    }
+    
+    fn has_east(&self) -> bool {
+        matches!(self, Direction::East | Direction::SouthEast | Direction::NorthEast)
+    }
+    
+    fn has_south(&self) -> bool {
+        matches!(self, Direction::South | Direction::SouthEast | Direction::SouthWest)
+    }
+    
+    fn has_west(&self) -> bool {
+        matches!(self, Direction::West | Direction::NorthWest | Direction::SouthWest)
     }
 }
 
