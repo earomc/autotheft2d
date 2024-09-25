@@ -6,6 +6,9 @@ pub trait Draw<'a> {
     fn texture_size_scaled() -> f32;
     fn draw_at_screen_space(&self, screen_pos: Vec2);
     fn draw_at_world_space(&self, camera_pos: Vec2) {
+        if camera_pos.distance(self.position()) > screen_width() {
+            return;
+        }
         self.draw_at_screen_space(
             (
                 -camera_pos.x + self.position().x + screen_width() / 2.
