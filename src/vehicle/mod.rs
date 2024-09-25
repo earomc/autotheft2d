@@ -4,7 +4,7 @@ use core::{f32, f64};
 use gearbox::Gearbox;
 use macroquad::prelude::*;
 
-use crate::{draw::Draw, Update};
+use crate::{controller::ControllerDirectionState, draw::Draw, Direction, Update};
 
 pub struct Vehicle<'a> {
     texture: &'a Texture2D,
@@ -156,6 +156,52 @@ impl<'a> Vehicle<'a> {
 
     pub fn force_from_wheel_torque(&self, torque: f32) -> f32 {
         torque / self.wheel_diameter
+    }
+    
+    pub fn handle_controls(&mut self, facing: Option<Direction>) {
+        match facing {
+            // refactor by passing in ControllerState directly? makes code simpler.
+            Some(facing) => {
+                match facing {
+                    Direction::North => {
+                        self.throttle = 1.;
+                        self.steer_neutral();
+                    },
+                    Direction::NorthEast => {
+                        self.throttle = 1.;
+                        self.steer_right();
+                    },
+                    Direction::East => {
+                        self.steer_right();
+                        self.throttle = 0.;
+                    },
+                    Direction::SouthEast => {
+                        self.steer_right();
+                        self.throttle = -1.;
+                    },
+                    Direction::South => {
+                        self.throttle = -1.;
+                        self.steer_neutral();
+                    },
+                    Direction::SouthWest => {
+                        self.steer_left();
+                        self.throttle = -1.
+                    },
+                    Direction::West => {
+                        self.steer_left();
+                        self.throttle = 0.;
+                    },
+                    Direction::NorthWest => {
+                        self.steer_left();
+                        self.throttle = 1.;
+                    },
+                }
+            },
+            None => {
+                self.throttle = 0.;
+                self.steer_neutral();
+            }
+        }
     }
 }
 

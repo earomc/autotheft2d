@@ -1,5 +1,5 @@
 use std::{cell::RefCell, rc::Rc};
-use autotheft2d::{controller::ControllerState, draw::Draw, map::Map, player::Player, util::SpiralIterator, vehicle::Vehicle, Update};
+use autotheft2d::{controller::ControllerDirectionState, draw::Draw, map::Map, player::Player, util::SpiralIterator, vehicle::Vehicle, Update};
 use macroquad::prelude::*;
 const WINDOW_HEIGHT: i32 = 720;
 const WINDOW_WIDTH: i32 = 1280;
@@ -25,7 +25,7 @@ async fn main() {
     let mut vehicles = Vec::new();
     let vehicle = Rc::new(RefCell::new(Vehicle::new(&vehicle_sprite)));
     vehicles.push(vehicle);
-    let mut controller = ControllerState::default();
+    let mut controller = ControllerDirectionState::default();
     loop {
         controller.handle_key_inputs(&mut player);
         clear_background(DARKGREEN);

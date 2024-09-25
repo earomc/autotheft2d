@@ -3,7 +3,7 @@ use macroquad::prelude::*;
 use crate::{player::Player, Direction};
 
 pub fn handle_key_inputs(character: &mut Player) {
-    let mut state = ControllerState::default();
+    let mut state = ControllerDirectionState::default();
     state.update_state();
     if let Some(facing) = state.get_facing() {
         character.facing = facing;
@@ -12,17 +12,17 @@ pub fn handle_key_inputs(character: &mut Player) {
 }
 
 #[derive(Default)]
-pub struct ControllerState {
+pub struct ControllerDirectionState {
     pub up: bool,
     pub left: bool,
     pub down: bool,
     pub right: bool,
 }
 
-impl ControllerState {
+impl ControllerDirectionState {
     pub fn handle_key_inputs(&mut self, player: &mut Player) {
         self.update_state();
-        player.handle_controls(self);
+        player.handle_controls(self.get_facing());
     }
     fn update_state(&mut self) {
         if is_key_down(KeyCode::W) {
@@ -49,49 +49,49 @@ impl ControllerState {
     
     pub fn get_facing(&self) -> Option<Direction> {
         match self {
-            ControllerState {
+            ControllerDirectionState {
                 up: true,
                 left: false,
                 down: false,
                 right: false,
             } => Some(Direction::North),
-            ControllerState {
+            ControllerDirectionState {
                 up: true,
                 left: false,
                 down: false,
                 right: true,
             } => Some(Direction::NorthEast),
-            ControllerState {
+            ControllerDirectionState {
                 up: false,
                 left: false,
                 down: false,
                 right: true,
             } => Some(Direction::East),
-            ControllerState {
+            ControllerDirectionState {
                 up: false,
                 left: false,
                 down: true,
                 right: true,
             } => Some(Direction::SouthEast),
-            ControllerState {
+            ControllerDirectionState {
                 up: false,
                 left: false,
                 down: true,
                 right: false,
             } => Some(Direction::South),
-            ControllerState {
+            ControllerDirectionState {
                 up: false,
                 left: true,
                 down: true,
                 right: false,
             } => Some(Direction::SouthWest),
-            ControllerState {
+            ControllerDirectionState {
                 up: false,
                 left: true,
                 down: false,
                 right: false,
             } => Some(Direction::West),
-            ControllerState {
+            ControllerDirectionState {
                 up: true,
                 left: true,
                 down: false,

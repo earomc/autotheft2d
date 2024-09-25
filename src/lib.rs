@@ -1,6 +1,7 @@
 pub mod controller;
 pub mod draw;
 pub mod map;
+pub mod weapons;
 pub mod player;
 pub mod vehicle;
 pub mod util;
