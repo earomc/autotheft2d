@@ -2,9 +2,21 @@ use macroquad::prelude::*;
 
 use crate::draw::Draw;
 
-struct Weapon<'a> {
+pub struct Weapon<'a> {
     pub texture: &'a Texture2D,
     pub fire_cooldown_seconds: f32,
+    pub pos: Vec2,
+}
+
+impl<'a> Weapon<'a> {
+    pub fn new(texture: &'a Texture2D, fire_cooldown_seconds: f32) -> Self {
+        texture.set_filter(FilterMode::Nearest);
+        Self {
+            texture,
+            fire_cooldown_seconds,
+            pos: (0., 0.).into(),
+        }
+    }
 }
 
 impl<'a> Draw<'a> for Weapon<'a> {
@@ -34,6 +46,6 @@ impl<'a> Draw<'a> for Weapon<'a> {
     }
 
     fn position(&self) -> Vec2 {
-        todo!()
+        self.pos
     }
 }
