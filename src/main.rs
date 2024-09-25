@@ -50,13 +50,15 @@ async fn main() {
             v.update();
         });
         if let Some(vehicle) = player.in_vehicle.clone() {
-            let velocity = vehicle.borrow().velocity;
+            let vehicle = vehicle.borrow();
+            let velocity = vehicle.velocity;
             let speed_text = &format!("{:.2} km/h", velocity * 3.6);
             draw_text(speed_text, screen_width() / 2., screen_height() - 140., 50., WHITE);
+            draw_text(&format!("Acceleration: {:.10}", vehicle.acceleration), screen_width() / 2., screen_height(), 50., WHITE);
         }
         draw_text(&format!("pos: {:.2?}", player.pos), screen_width() / 2., screen_height() - 40., 50., WHITE);
-        draw_text(&format!("pos: {:.2?}", map.to_tile_index_pos(player.pos)), screen_width() / 2., screen_height() - 70., 50., WHITE);
-        
+        draw_text(&format!("pos (tile): {:.2?}", map.to_tile_index_pos(player.pos)), screen_width() / 2., screen_height() - 70., 50., WHITE);
+
         next_frame().await
     }
 }

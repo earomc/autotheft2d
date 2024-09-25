@@ -1,9 +1,10 @@
-use core::f32;
-use std::{f32::consts::*, ptr::eq};
+pub mod gearbox;
 
+use core::{f32, f64};
+use gearbox::Gearbox;
 use macroquad::prelude::*;
 
-use crate::{draw::Draw, player::Player, Update};
+use crate::{draw::Draw, Update};
 
 pub struct Vehicle<'a> {
     texture: &'a Texture2D,
@@ -21,6 +22,8 @@ pub struct Vehicle<'a> {
     pub throttle: f32,
     pub breaking_torque: f32,
     pub wheel_diameter: f32,
+    pub rpm: f32,
+    pub gearbox: Gearbox,
 }
 
 pub const TEX_SIZE: f32 = 32.;
@@ -50,7 +53,7 @@ impl<'a> Draw<'a> for Vehicle<'a> {
             WHITE,
             DrawTextureParams {
                 dest_size: Some((TEX_SIZE * SCALING_FAC, TEX_SIZE * SCALING_FAC).into()),
-                rotation: self.rotation.to_angle() + FRAC_PI_2,
+                rotation: self.rotation.to_angle() + core::f32::consts::FRAC_PI_2,
                 //pivot: (),
                 ..Default::default()
             },
@@ -64,37 +67,44 @@ impl<'a> Draw<'a> for Vehicle<'a> {
 
 impl Update for Vehicle<'_> {
     fn update(&mut self) {
-        
+        let drag_force = drag_force(
+            1.293, // air density
+            self.velocity,
+            1.3, // reference area
+            0.4, // drag coefficient
+        );
+        self.apply_force(-drag_force, get_frame_time());
         if self.throttle > 0. {
             self.reversed = false;
-            self.apply_force(self.force_from_wheel_torque(self.throttle * self.torque), get_frame_time());
+            self.apply_force(
+                self.force_from_wheel_torque(self.throttle * self.torque * self.gearbox.current_gear().ratio),
+                get_frame_time(),
+            );
             print_velocity(self.velocity, "Accelerating!");
         } else {
             if self.velocity <= 0.0 {
                 self.reversed = true;
             }
             if self.reversed {
-                self.apply_force(self.force_from_wheel_torque(self.throttle * self.reverse_torque), get_frame_time());
+                self.apply_force(
+                    self.force_from_wheel_torque(self.throttle * self.reverse_torque),
+                    get_frame_time(),
+                );
                 print_velocity(self.velocity, "Reversing!");
             } else {
-                self.apply_force(self.force_from_wheel_torque(self.throttle * self.breaking_torque), get_frame_time());
+                self.apply_force(
+                    self.force_from_wheel_torque(self.throttle * self.breaking_torque),
+                    get_frame_time(),
+                );
                 print_velocity(self.velocity, "Braking!");
             }
         }
         // F = m * a, a = F/m
         self.rotation = self
             .rotation
-            .rotate(Vec2::from_angle(self.turning_angle * 0.03));
-        
-        let drag_force =  drag_force(
-            1.293, // air density
-            self.velocity,
-            1.3, // reference area
-            0.4 // drag coefficient
-        );
-        dbg!(drag_force);
-        self.apply_force(-drag_force, get_frame_time());
-        self.pos += self.rotation * self.velocity * 8. * if self.reversed { -1. } else { 1. };
+            .rotate(Vec2::from_angle((self.turning_angle * 0.03) as f32));
+
+        self.pos += self.rotation * self.velocity * if self.reversed { -1. } else { 1. };
     }
 }
 
@@ -120,7 +130,9 @@ impl<'a> Vehicle<'a> {
             mass: 1300., // 1.3 metric tons
             reversed: false,
             breaking_torque: 10000.,
-            wheel_diameter: 0.4
+            wheel_diameter: 0.4,
+            gearbox: Gearbox::six_step(),
+            rpm: 0.
         }
     }
 
@@ -135,13 +147,13 @@ impl<'a> Vehicle<'a> {
     pub fn steer_neutral(&mut self) {
         self.turning_angle = 0.;
     }
-    
+
     pub fn apply_force(&mut self, force: f32, time: f32) {
         // a = F/m
-        let acceleration = force / self.mass;
-        self.velocity = (self.velocity + acceleration * time).max(0.);
+        self.acceleration = force / self.mass;
+        self.velocity = (self.velocity + self.acceleration * time).max(0.);
     }
-    
+
     pub fn force_from_wheel_torque(&self, torque: f32) -> f32 {
         torque / self.wheel_diameter
     }
