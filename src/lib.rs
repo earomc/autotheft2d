@@ -1,12 +1,18 @@
+pub mod collide;
 pub mod controller;
 pub mod draw;
 pub mod map;
 pub mod weapons;
 pub mod player;
-pub mod vehicle;
 pub mod util;
+pub mod vehicle;
 
+use std::{cell::RefCell, rc::Rc};
+
+use collide::Collide;
 use macroquad::prelude::*;
+use map::Map;
+use vehicle::Vehicle;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Direction {
@@ -84,3 +90,26 @@ impl Iterator for DirectionIter {
 pub trait Update {
     fn update(&mut self);
 }
+
+pub struct World {
+    pub vehicles: Vec<Rc<RefCell<Vehicle>>>,
+    pub collideables: Vec<Rc<RefCell<dyn Collide>>>,
+    pub map: Map,
+}
+
+impl World {
+    pub fn new(map: Map) -> Self {
+        World {
+            vehicles: Vec::new(),
+            collideables: Vec::new(),
+            map,
+        }
+    }
+
+    pub fn add_vehicle(&mut self, vehicle: Vehicle) {
+        let vehicle_rc = Rc::new(RefCell::new(vehicle));
+        self.collideables.push(vehicle_rc.clone());
+        self.vehicles.push(vehicle_rc);
+    }
+}
+

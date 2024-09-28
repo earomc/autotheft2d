@@ -7,13 +7,13 @@ pub const TILE_TEX_SIZE: f32 = 32.;
 pub const TILE_TEXTURE_SCALING_FAC: f32 = 16.;
 pub const TILE_TEX_SIZE_SCALED: f32 = TILE_TEX_SIZE * TILE_TEXTURE_SCALING_FAC;
 
-pub struct Map<'a> {
-    tiles: Array2<Tile<'a>>,
+pub struct Map {
+    tiles: Array2<Tile>,
     world_size: usize,
 }
 
-impl<'a> Map<'a> {
-    pub fn new(tile_map_texture: &'a Texture2D, world_length_tiles: usize) -> Self {
+impl Map {
+    pub fn new(tile_map_texture: Texture2D, world_length_tiles: usize) -> Self {
         let tile = Tile::new(
             tile_map_texture,
             (0., 0.).into(),
@@ -40,7 +40,7 @@ impl<'a> Map<'a> {
         (x as usize, y as usize)
     }
     
-    pub fn draw(&self, player_pos: Vec2, radius: usize) -> Option<&Tile<'a>> {
+    pub fn draw(&self, player_pos: Vec2, radius: usize) -> Option<&Tile> {
         let center = self.to_tile_index_pos(player_pos);
         let spiral = SpiralIterator::new(center);
         self.tiles.get(center).map(|tile| tile.draw_at_world_space(player_pos));
@@ -51,20 +51,20 @@ impl<'a> Map<'a> {
         self.tiles.get(self.to_tile_index_pos(player_pos))
     }
     
-    pub fn get_tile(&self, pos: (usize, usize)) -> Option<&Tile<'a>> {
+    pub fn get_tile(&self, pos: (usize, usize)) -> Option<&Tile> {
         self.tiles.get(pos)
     }
 }
 
 #[derive(Clone)]
-pub struct Tile<'a> {
+pub struct Tile {
     pos: Vec2,
-    texture: &'a Texture2D,
+    texture: Texture2D,
     texture_x_offset: f32,
 }
 
-impl<'a> Tile<'a> {
-    pub fn new(texture: &'a Texture2D, pos: Vec2, variant: TileVariant) -> Self {
+impl Tile {
+    pub fn new(texture: Texture2D, pos: Vec2, variant: TileVariant) -> Self {
         texture.set_filter(FilterMode::Nearest);
         Tile {
             texture,
@@ -74,8 +74,8 @@ impl<'a> Tile<'a> {
     }
 }
 
-impl<'a> Draw<'a> for Tile<'a> {
-    fn texture(&self) -> &'a Texture2D {
+impl Draw for Tile {
+    fn texture(&self) -> &Texture2D {
         &self.texture
     }
 

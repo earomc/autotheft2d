@@ -1,3 +1,5 @@
+use macroquad::prelude::*;
+
 #[derive(Debug)]
 pub struct SpiralIterator {
     direction: (isize, isize), // Current movement direction
@@ -65,4 +67,9 @@ impl Iterator for SpiralIterator {
             None
         }
     }
+}
+
+pub fn mouse_direction() -> Vec2 {
+    let mouse_local = mouse_position_local();
+    Vec2::new(mouse_local.x * screen_width(), mouse_local.y * screen_height()).normalize()
 }

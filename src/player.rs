@@ -1,22 +1,22 @@
-use std::{cell::RefCell, env::consts::FAMILY, rc::Rc};
+use std::{cell::RefCell, rc::Rc};
 
-use crate::{controller::ControllerDirectionState, draw::Draw, vehicle::Vehicle, Direction, Update};
+use crate::{draw::Draw, vehicle::Vehicle, Direction, Update};
 use macroquad::prelude::*;
 
 pub const PLAYER_TEXTURE_SCALING_FAC: f32 = 4.;
 pub const PLAYER_SPRITE_SIZE: f32 = 16.;
 pub const SCALED_PLAYER_SPRITE_SIZE: f32 = PLAYER_TEXTURE_SCALING_FAC * PLAYER_SPRITE_SIZE;
 
-pub struct Player<'a> {
+pub struct Player {
     pub pos: Vec2,
     pub facing: Direction,
-    pub texture: &'a Texture2D,
+    pub texture: Texture2D,
     pub movement_speed: f32,
-    pub in_vehicle: Option<Rc<RefCell<Vehicle<'a>>>>,
+    pub in_vehicle: Option<Rc<RefCell<Vehicle>>>,
 }
 
-impl<'a> Player<'a> {
-    pub fn new(texture: &'a Texture2D) -> Self {
+impl Player {
+    pub fn new(texture: Texture2D) -> Self {
         texture.set_filter(FilterMode::Nearest);
         Player {
             pos: (0., 0.).into(),
@@ -56,12 +56,12 @@ impl<'a> Player<'a> {
         }
     }
 
-    pub fn enter_vehicle(&mut self, vehicle: Rc<RefCell<Vehicle<'a>>>) {
+    pub fn enter_vehicle(&mut self, vehicle: Rc<RefCell<Vehicle>>) {
         vehicle.borrow_mut().entered = true;
         self.in_vehicle = Some(vehicle)
     }
 
-    pub fn leave_vehicle(&mut self, vehicle: Rc<RefCell<Vehicle<'a>>>) {
+    pub fn leave_vehicle(&mut self, vehicle: Rc<RefCell<Vehicle>>) {
         let mut vehicle = vehicle.borrow_mut();
         vehicle.entered = false;
         vehicle.steer_neutral();
@@ -70,17 +70,17 @@ impl<'a> Player<'a> {
     }
 }
 
-impl Update for Player<'_> {
+impl Update for Player {
     fn update(&mut self) {
         if let Some(vehicle) = self.in_vehicle.clone() {
-            self.pos = vehicle.borrow().pos;
+            self.pos = vehicle.borrow().position();
         }
     }
 }
 
-impl<'a> Draw<'a> for Player<'a> {
-    fn texture(&self) -> &'a Texture2D {
-        self.texture
+impl Draw for Player {
+    fn texture(&self) -> &Texture2D {
+        &self.texture
     }
 
     fn texture_size() -> f32 {

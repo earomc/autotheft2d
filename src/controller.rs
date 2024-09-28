@@ -22,6 +22,7 @@ pub struct ControllerDirectionState {
 impl ControllerDirectionState {
     pub fn handle_key_inputs(&mut self, player: &mut Player) {
         self.update_state();
+        
         player.handle_controls(self.get_facing());
     }
     fn update_state(&mut self) {
